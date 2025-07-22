@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>The Aesthetics Lab - AI Creator Vault</title>
+<style>
+  body { background: #0a0a1a; color: #00ffff; font-family: 'JetBrains Mono', monospace; margin: 0; padding: 0; height: 100vh; overflow-x: hidden; display: flex; align-items: center; justify-content: center; }
+  #container { width: 100%; max-width: 540px; padding: 1rem; background: #10102b; border: 2px solid #00ffff; border-radius: 14px; box-shadow: 0 0 30px #00ffffc0; }
+  .terminal {
+    font-size: 1rem;
+    line-height: 1.4;
+    min-height: 7rem;
+    background: linear-gradient(45deg, #001010 0%, #002020 100%);
+    border-radius: 10px;
+    padding: 1rem;
+    box-shadow: inset 0 0 15px #00ffff88;
+    overflow-wrap: break-word;
+    white-space: pre-line;
+  }
+  @keyframes blink { 0%, 50% { opacity: 1; } 50.01%, 100% { opacity: 0; } }
+  .blinking-cursor { display: inline-block; width: 10px; height: 20px; background: #00ffff; margin-left: 2px; animation: blink 1s infinite step-start; vertical-align: bottom; }
+  .color-swatch { display: inline-block; width: 60px; height: 60px; margin: 5px; border-radius: 14px; box-shadow: 0 0 10px #004040; cursor: pointer; border: 2px solid transparent; transition: box-shadow 0.3s, filter 0.3s; }
+  .color-swatch.correct { box-shadow: 0 0 20px #00ffff, 0 0 40px #00ffff, inset 0 0 20px #00ffff; filter: brightness(1.1); }
+  .color-swatch.incorrect { filter: grayscale(100%) brightness(0.5); box-shadow: none; cursor: not-allowed; }
+  .font-option { background: #001520; margin: 0.5rem 0; padding: 0.6rem 1rem; border-radius: 10px; cursor: pointer; border: 2px solid transparent; box-shadow: 0 0 15px #002c4c; transition: border-color 0.3s, box-shadow 0.3s; }
+  .font-option.correct { border-color: #00ffff; box-shadow: 0 0 20px #00ffff, 0 0 40px #00ffff; }
+  .font-option:hover { border-color: #00ffff; }
+  .drag-blocks { display: flex; justify-content: space-around; margin-top: 15px; }
+  .drag-block { width: 90px; height: 90px; background: #003030; color: #00ffff; border-radius: 10px; border: 2px solid #007777; display: flex; align-items: center; justify-content: center; cursor: grab; font-weight: 700; user-select: none; margin: 0 10px; box-shadow: 0 0 10px #00ffff55; transition: box-shadow 0.3s; }
+  .drag-block.dragging { opacity: 0.7; box-shadow: 0 0 30px #00ffffcc; }
+  .drop-zone { flex-grow: 1; margin-left: 1rem; background: #002020; border-radius: 10px; border: 3px dashed #00ffff; display: flex; flex-direction: column; align-items: stretch; padding: 1rem; }
+  .drop-slot { flex: 1; min-height: 40px; margin-bottom: 0.8rem; background: #001010; border-radius: 8px; border: 2px solid transparent; display: flex; align-items: center; justify-content: center; color: #00ffffaa; font-style: italic; font-weight: 700; }
+  .drop-slot.filled { border-color: #00ff41; color: #00ff41; font-style: normal; }
+  .message { margin-top: 1rem; text-align: center; font-weight: 700; font-size: 1.2rem; color: #00ff41; }
+  .message.error { color: #ff0044; }
+  .download-btn { margin-top: 2rem; font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 1.1rem; text-transform: uppercase; background: linear-gradient(135deg, #00ffff, #ff00ff); border: none; border-radius: 16px; padding: 1rem 2rem; color: #0a0a0a; cursor: pointer; box-shadow: 0 0 25px #ff00ff, 0 0 45px #00ffff; transition: transform 0.3s, box-shadow 0.3s; display: block; width: 100%; text-align: center; text-decoration: none; }
+  .download-btn:hover { transform: scale(1.05); box-shadow: 0 0 30px #ff00ff, 0 0 60px #00ffff; }
+  .animated-text { font-weight: 700; font-size: 1.1rem; color: #00ff41; text-align: center; margin-bottom: 0.5rem; opacity: 0; }
+</style>
+</head>
+<body>
+<div id="container">
+  <div id="missionBriefing" class="terminal"></div>
+  <button id="startBtn" style="margin-top:1rem; background:#00ffff; color:#0a0a0a; border:none; padding:0.6rem 1.2rem; border-radius:10px; cursor:pointer; font-weight:700; display:none;">BEGIN CALIBRATION</button>
+  <div id="challengeSection" style="display:none; margin-top:1rem;"></div>
+  <div id="rewardSection" style="display:none; margin-top:2rem;"></div>
+</div>
+<script>
+const missionLines = [
+  "[CONNECTION ESTABLISHED...]",
+  "[AUTHENTICATING USER...]",
+  "[WELCOME, CREATOR.]",
+  ">> MISSION: CALIBRATE AESTHETIC PROTOCOL 7.",
+  ">> OBJECTIVE: Assemble a cohesive visual signature to unlock the Canva Template Vault.",
+  ">> STATUS: AWAITING YOUR COMMAND."
+];
+const missionElement = document.getElementById('missionBriefing');
+const startBtn = document.getElementById('startBtn');
+const challengeSection = document.getElementById('challengeSection');
+const rewardSection = document.getElementById('rewardSection');
+// Typing effect
+function typeText(lines, container, delay=60, callback) {
+  let lineIndex = 0, charIndex = 0, output = '';
+  function type() {
+    if (lineIndex >= lines.length) { if (callback) callback(); return; }
+    const line = lines[lineIndex];
+    if (charIndex < line.length) {
+      output += line.charAt(charIndex);
+      container.textContent = output + '_';
+      charIndex++; setTimeout(type, delay);
+    } else {
+      output += '\n';
+      container.textContent = output;
+      charIndex = 0; lineIndex++;
+      setTimeout(type, delay * 10);
+    }
+  } type();
+}
+typeText(missionLines, missionElement, 50, () => {
+  missionElement.textContent = missionLines.join('\n');
+  startBtn.style.display = 'inline-block';
+});
+const challenges = {
+  challenge01: {
+    title: "Calibrate the Color Matrix",
+    instruction: "STABILIZE THE CORE FREQUENCY. SELECT THE THREE PRIMARY BRAND HUES.",
+    colors: [
+      {name: "Cyan", correct:true, colorCode: "#00FFFF"},
+      {name: "Magenta", correct:true, colorCode: "#FF00FF"},
+      {name: "Green", correct:true, colorCode: "#00FF41"},
+      {name: "Decoy", correct:false, colorCode: "#FF8000"}
+    ]
+  },
+  challenge02: {
+    title: "Align Font Protocols",
+    instruction: "SELECT THE FONT PAIRING WITH THE HIGHEST SIGNAL-TO-NOISE RATIO.",
+    options: [
+      {pairing: "Sharp Serif & Clean Sans-Serif", correct:true},
+      {pairing: "Generic Bubbly Font", correct:false}
+    ]
+  },
+  challenge03: {
+    title: "Assemble the Grid Layout",
+    instruction: "CONSTRUCT THE VISUAL HIERARCHY.",
+    blocks: ["IMAGE", "HEADLINE", "BODY"],
+    correctOrder: ["IMAGE", "HEADLINE", "BODY"]
+  }
+};
+let currentChallenge = 1;
+let colorSelections = new Set();
+function renderChallenge(challengeNum) {
+  challengeSection.innerHTML = '';
+  colorSelections.clear();
+  if (challengeNum === 1) { renderColorMatrix(); }
+  else if (challengeNum === 2) { renderFontProtocols(); }
+  else if (challengeNum === 3) { renderGridAssembly(); }
+}
+// Challenge 1: Color matrix
+function renderColorMatrix() {
+  const challenge = challenges.challenge01;
+  const title = document.createElement('h3');
+  title.textContent = challenge.title;
+  const instruction = document.createElement('p');
+  instruction.textContent = challenge.instruction;
+  const colorsDiv = document.createElement('div');
+  challenge.colors.forEach(c => {
+    const swatch = document.createElement('div');
+    swatch.className = 'color-swatch';
+    swatch.style.backgroundColor = c.colorCode;
+    swatch.dataset.correct = c.correct;
+    swatch.title = c.name;
+    swatch.addEventListener('click', () => {
+      if (swatch.classList.contains('correct') || swatch.classList.contains('incorrect')) return;
+      if (c.correct) {
+        colorSelections.add(c.name);
+        swatch.classList.add('correct');
+        playBleep();
+        if (colorSelections.size === 3) {
+          showMessage('MATRIX STABLE', false);
+          setTimeout(() => { advanceChallenge(); }, 1000);
+        }
+      } else {
+        swatch.classList.add('incorrect');
+        showMessage('ERROR: INVALID HUE', true);
+        playError();
+      }
+    });
+    colorsDiv.appendChild(swatch);
+  });
+  challengeSection.appendChild(title);
+  challengeSection.appendChild(instruction);
+  challengeSection.appendChild(colorsDiv);
+}
+// Challenge 2: Font protocols
+function renderFontProtocols() {
+  const challenge = challenges.challenge02;
+  const title = document.createElement('h3');
+  title.textContent = challenge.title;
+  const instruction = document.createElement('p');
+  instruction.textContent = challenge.instruction;
+  challengeSection.appendChild(title);
+  challengeSection.appendChild(instruction);
+  challenge.options.forEach(opt => {
+    const optDiv = document.createElement('div');
+    optDiv.className = 'font-option';
+    optDiv.textContent = opt.pairing;
+    optDiv.addEventListener('click', () => {
+      if (opt.correct) {
+        optDiv.classList.add('correct');
+        showMessage('PROTOCOL ALIGNED', false);
+        playBleep();
+        setTimeout(() => { advanceChallenge(); }, 1000);
+      } else {
+        optDiv.style.backgroundColor = '#330000';
+        showMessage('ERROR: LOW SIGNAL DETECTED', true);
+        playError();
+      }
+    });
+    challengeSection.appendChild(optDiv);
+  });
+}
+// Challenge 3: Grid Assembly
+function renderGridAssembly() {
+  const challenge = challenges.challenge03;
+  const title = document.createElement('h3');
+  title.textContent = challenge.title;
+  const instruction = document.createElement('p');
+  instruction.textContent = challenge.instruction;
+  challengeSection.appendChild(title);
+  challengeSection.appendChild(instruction);
+  const blocksDiv = document.createElement('div');
+  blocksDiv.className = 'drag-blocks';
+  challenge.blocks.forEach(block => {
+    const div = document.createElement('div');
+    div.className = 'drag-block';
+    div.textContent = block;
+    div.draggable = true;
+    div.dataset.blockName = block;
+    div.addEventListener('dragstart', (e) => {
+      e.dataTransfer.setData('text/plain', block);
+      e.target.classList.add('dragging');
+    });
+    div.addEventListener('dragend', (e) => {
+      e.target.classList.remove('dragging');
+    });
+    blocksDiv.appendChild(div);
+  });
+  const dropZone = document.createElement('div');
+  dropZone.className = 'drop-zone';
+  const dropSlots = [];
+  for (let i = 0; i < 3; i++) {
+    const slot = document.createElement('div');
+    slot.className = 'drop-slot';
+    slot.dataset.index = i;
+    slot.textContent = `[${challenge.correctOrder[i]}]`;
+    dropZone.appendChild(slot);
+    dropSlots.push(slot);
+    slot.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      slot.style.borderColor = '#00ff41';
+    });
+    slot.addEventListener('dragleave', () => {
+      slot.style.borderColor = 'transparent';
+    });
+    slot.addEventListener('drop', (e) => {
+      e.preventDefault();
+      const draggedBlock = e.dataTransfer.getData('text/plain');
+      const correctBlock = challenge.correctOrder[slot.dataset.index];
+      if (draggedBlock === correctBlock) {
+        if (slot.classList.contains('filled')) return;
+        slot.classList.add('filled');
+        slot.textContent = draggedBlock;
+        slot.style.borderColor = '#00ff41';
+        playClunk();
+        checkGridCompletion();
+        const dragBlocks = document.querySelectorAll('.drag-block');
+        dragBlocks.forEach(db => {
+          if (db.textContent === draggedBlock) {
+            db.style.visibility = 'hidden';
+            db.draggable = false;
+          }
+        });
+      } else {
+        showMessage('ERROR: INCORRECT PLACEMENT', true);
+        playError();
+      }
+    });
+  }
+  challengeSection.appendChild(blocksDiv);
+  challengeSection.appendChild(dropZone);
+}
+function checkGridCompletion() {
+  const slots = document.querySelectorAll('.drop-slot');
+  const filledCount = Array.from(slots).filter(s => s.classList.contains('filled')).length;
+  if (filledCount === slots.length) {
+    const dropZone = document.querySelector('.drop-zone');
+    dropZone.style.transition = 'background-color 0.4s';
+    dropZone.style.backgroundColor = '#00ff4166';
+    setTimeout(() => { dropZone.style.backgroundColor = '#002020'; }, 300);
+    playBleep();
+    setTimeout(() => { advanceChallenge(); }, 1000);
+  }
+}
+let messageTimeout = null;
+function showMessage(text, isError) {
+  let messageDiv = document.getElementById('message');
+  if (!messageDiv) {
+    messageDiv = document.createElement('div');
+    messageDiv.id = 'message';
+    messageDiv.className = 'message';
+    challengeSection.appendChild(messageDiv);
+  }
+  messageDiv.textContent = text;
+  messageDiv.classList.toggle('error', isError);
+  if (messageTimeout) clearTimeout(messageTimeout);
+  messageTimeout = setTimeout(() => { messageDiv.textContent = ''; }, 3000);
+}
+// Sound effects (replace with real audio if desired)
+const bleepSound = new Audio('data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAABCxAgAEABAAZGF0YQAAAAA=');
+function playBleep() { bleepSound.play().catch(() => {}); }
+function playError() { /* Could play error beep here */ }
+function playClunk() { /* Could play clunk sound here */ }
+function advanceChallenge() {
+  currentChallenge++;
+  if (currentChallenge <= 3) { renderChallenge(currentChallenge); }
+  else { showReward(); }
+}
+function showReward() {
+  challengeSection.style.display = 'none';
+  rewardSection.style.display = 'block';
+  rewardSection.innerHTML = '';
+  const texts = [
+    '[AESTHETIC PROTOCOL COMPLETE.]',
+    '[SECURITY LOCKS DISENGAGED.]',
+    '[VAULT ACCESS GRANTED.]'
+  ];
+  texts.forEach((line, i) => {
+    const div = document.createElement('div');
+    div.className = 'animated-text';
+    div.textContent = line;
+    rewardSection.appendChild(div);
+    setTimeout(() => { div.style.opacity = 1; }, 150 * i);
+  });
+  const downloadLink = document.createElement('a');
+  downloadLink.href = 'https://www.canva.com/design/DAGt4phZ3UQ/2H83CFApjaQm10hSTSg6EA/view?utm_content=DAGt4phZ3UQ&utm_campaign=designshare&utm_medium=link&utm_source=publishsharelink&mode=preview';
+  downloadLink.target = '_blank';
+  downloadLink.rel = 'noopener noreferrer';
+  downloadLink.className = 'download-btn';
+  downloadLink.textContent = 'DOWNLOAD TEMPLATE BUNDLE';
+  rewardSection.appendChild(downloadLink);
+}
+startBtn.onclick = () => {
+  startBtn.style.display = 'none';
+  missionElement.style.display = 'none';
+  challengeSection.style.display = 'block';
+  renderChallenge(currentChallenge);
+};
+</script>
+</body>
+</html>
