@@ -4,71 +4,288 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>The Aesthetics Lab - AI Creator Vault</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 <style>
-  body { background: #0a0a1a; color: #00ffff; font-family: 'JetBrains Mono', monospace; margin: 0; padding: 0; height: 100vh; overflow-x: hidden; display: flex; align-items: center; justify-content: center; }
-  #container { width: 100%; max-width: 540px; padding: 1rem; background: #10102b; border: 2px solid #00ffff; border-radius: 14px; box-shadow: 0 0 30px #00ffffc0; }
-  .terminal {
-    font-size: 1rem;
-    line-height: 1.4;
-    min-height: 7rem;
-    background: linear-gradient(45deg, #001010 0%, #002020 100%);
-    border-radius: 10px;
-    padding: 1rem;
-    box-shadow: inset 0 0 15px #00ffff88;
-    overflow-wrap: break-word;
-    white-space: pre-line;
-  }
-  @keyframes blink { 0%, 50% { opacity: 1; } 50.01%, 100% { opacity: 0; } }
-  .blinking-cursor { display: inline-block; width: 10px; height: 20px; background: #00ffff; margin-left: 2px; animation: blink 1s infinite step-start; vertical-align: bottom; }
-  .color-swatch { display: inline-block; width: 60px; height: 60px; margin: 5px; border-radius: 14px; box-shadow: 0 0 10px #004040; cursor: pointer; border: 2px solid transparent; transition: box-shadow 0.3s, filter 0.3s; }
-  .color-swatch.correct { box-shadow: 0 0 20px #00ffff, 0 0 40px #00ffff, inset 0 0 20px #00ffff; filter: brightness(1.1); }
-  .color-swatch.incorrect { filter: grayscale(100%) brightness(0.5); box-shadow: none; cursor: not-allowed; }
-  .font-option { background: #001520; margin: 0.5rem 0; padding: 0.6rem 1rem; border-radius: 10px; cursor: pointer; border: 2px solid transparent; box-shadow: 0 0 15px #002c4c; transition: border-color 0.3s, box-shadow 0.3s; }
-  .font-option.correct { border-color: #00ffff; box-shadow: 0 0 20px #00ffff, 0 0 40px #00ffff; }
-  .font-option:hover { border-color: #00ffff; }
-  .drag-blocks { display: flex; justify-content: space-around; margin-top: 15px; }
-  .drag-block { width: 90px; height: 90px; background: #003030; color: #00ffff; border-radius: 10px; border: 2px solid #007777; display: flex; align-items: center; justify-content: center; cursor: grab; font-weight: 700; user-select: none; margin: 0 10px; box-shadow: 0 0 10px #00ffff55; transition: box-shadow 0.3s; }
-  .drag-block.dragging { opacity: 0.7; box-shadow: 0 0 30px #00ffffcc; }
-  .drop-zone { flex-grow: 1; margin-left: 1rem; background: #002020; border-radius: 10px; border: 3px dashed #00ffff; display: flex; flex-direction: column; align-items: stretch; padding: 1rem; }
-  .drop-slot { flex: 1; min-height: 40px; margin-bottom: 0.8rem; background: #001010; border-radius: 8px; border: 2px solid transparent; display: flex; align-items: center; justify-content: center; color: #00ffffaa; font-style: italic; font-weight: 700; }
-  .drop-slot.filled { border-color: #00ff41; color: #00ff41; font-style: normal; }
-  .message { margin-top: 1rem; text-align: center; font-weight: 700; font-size: 1.2rem; color: #00ff41; }
-  .message.error { color: #ff0044; }
-  .download-btn {
-    margin-top: 2rem;
-    font-family: 'JetBrains Mono', monospace;
-    font-weight: 700;
-    font-size: 1.1rem;
-    text-transform: uppercase;
-    background: linear-gradient(135deg, #00ffff, #ff00ff);
-    border: none;
-    border-radius: 16px;
-    padding: 1rem 2rem;
-    color: #0a0a0a;
-    cursor: pointer;
-    box-shadow: 0 0 25px #ff00ff, 0 0 45px #00ffff;
-    transition: transform 0.3s, box-shadow 0.3s;
-    display: block;
-    width: 100%;
-    text-align: center;
-    text-decoration: none;
-    box-sizing: border-box;
-    max-width: 100%;
-    overflow-wrap: anywhere;
-    white-space: normal;
-  }
-  .download-btn:hover { transform: scale(1.05); box-shadow: 0 0 30px #ff00ff, 0 0 60px #00ffff; }
-  .animated-text { font-weight: 700; font-size: 1.1rem; color: #00ff41; text-align: center; margin-bottom: 0.5rem; opacity: 0; }
-  @media (max-width: 600px) {
-    #container { max-width: 96vw; }
-    .download-btn { font-size: 1rem; padding: 0.8rem 1rem; }
-  }
+    :root {
+      --void-black: #0a0a0a;
+      --neural-surface: #1a1a1a;
+      --neon-cyan: #00FFFF;
+      --neon-magenta: #FF0080;
+      --neural-green: #00FF41;
+      --holo-text: #E0E0FF;
+      --dim-text: rgba(224, 224, 255, 0.6);
+      --font-mono: 'JetBrains Mono', monospace;
+      --font-sans: 'Inter', sans-serif;
+      --space-sm: 8px;
+      --space-md: 16px;
+      --space-lg: 24px;
+      --space-xl: 32px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+      --duration-normal: 0.3s;
+      --ease-neural: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    body { 
+      background: var(--void-black); 
+      color: var(--holo-text); 
+      font-family: var(--font-mono); 
+      margin: 0; 
+      padding: var(--space-lg); 
+      min-height: 100vh; 
+      overflow-x: hidden; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      box-sizing: border-box;
+    }
+    .neural-bg {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -2; /* Ensure it's behind everything */
+        overflow: hidden;
+    }
+    .circuit-grid {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: 
+        linear-gradient(rgba(0, 255, 255, 0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 255, 255, 0.08) 1px, transparent 1px);
+        background-size: 40px 40px;
+        animation: gridFlow 25s linear infinite;
+    }
+    @keyframes gridFlow {
+        0% { transform: translate(0, 0); }
+        100% { transform: translate(40px, 40px); }
+    }
+    #container { 
+      width: 100%; 
+      max-width: 700px; 
+      padding: var(--space-xl); 
+      background: var(--neural-surface); 
+      border: 1px solid rgba(0, 255, 255, 0.2); 
+      border-radius: var(--radius-xl); 
+      box-shadow: 0 0 30px rgba(0, 255, 255, 0.1); 
+      position: relative;
+      z-index: 1;
+    }
+    .terminal {
+      font-size: 1rem;
+      line-height: 1.5;
+      min-height: 10rem;
+      background: var(--void-black);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      box-shadow: inset 0 0 15px rgba(0, 255, 255, 0.2);
+      overflow-wrap: break-word;
+      white-space: pre-line;
+    }
+    .blinking-cursor { 
+        display: inline-block; 
+        width: 10px; 
+        height: 1.2em; 
+        background: var(--neon-cyan); 
+        margin-left: 2px; 
+        animation: blink 1s infinite step-start; 
+        vertical-align: bottom; 
+    }
+    @keyframes blink { 0%, 50% { opacity: 1; } 50.01%, 100% { opacity: 0; } }
+    
+    #startBtn {
+        margin-top: 1rem;
+        background: var(--neon-cyan);
+        color: var(--void-black);
+        border: none;
+        padding: var(--space-md) var(--space-lg);
+        border-radius: var(--radius-lg);
+        cursor: pointer;
+        font-weight: 700;
+        font-family: var(--font-mono);
+        text-transform: uppercase;
+        transition: all var(--duration-normal);
+    }
+    #startBtn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 20px var(--neon-cyan);
+    }
+
+    #challengeSection h3 {
+        color: var(--neon-magenta);
+        text-align: center;
+        margin-bottom: var(--space-sm);
+    }
+     #challengeSection p {
+        text-align: center;
+        color: var(--dim-text);
+        margin-top: 0;
+        margin-bottom: var(--space-xl);
+    }
+
+    .color-swatch { 
+        display: inline-block; 
+        width: 60px; 
+        height: 60px; 
+        margin: 5px; 
+        border-radius: var(--radius-lg); 
+        cursor: pointer; 
+        border: 2px solid var(--dim-text); 
+        transition: all var(--duration-normal); 
+    }
+    .color-swatch:hover {
+        transform: scale(1.1);
+        border-color: var(--neon-cyan);
+    }
+    .color-swatch.correct { 
+        border-color: var(--neural-green);
+        box-shadow: 0 0 15px var(--neural-green);
+    }
+    .color-swatch.incorrect { 
+        filter: grayscale(1) brightness(0.5); 
+        cursor: not-allowed; 
+    }
+
+    .font-option { 
+        background: var(--void-black); 
+        margin: 0.5rem 0; 
+        padding: var(--space-lg); 
+        border-radius: var(--radius-lg); 
+        cursor: pointer; 
+        border: 2px solid var(--dim-text); 
+        transition: all var(--duration-normal); 
+    }
+    .font-option.correct { 
+        border-color: var(--neural-green); 
+        box-shadow: 0 0 20px var(--neural-green); 
+    }
+    .font-option:hover { 
+        border-color: var(--neon-cyan); 
+        background: rgba(0, 255, 255, 0.05);
+    }
+
+    .layout-container {
+        display: grid;
+        grid-template-columns: 150px 1fr;
+        gap: var(--space-xl);
+        align-items: center;
+    }
+    .drag-blocks { 
+        display: flex; 
+        flex-direction: column;
+        gap: var(--space-md);
+    }
+    .drag-block { 
+        padding: var(--space-md);
+        background: transparent; 
+        color: var(--holo-text); 
+        border-radius: var(--radius-lg); 
+        border: 2px dashed var(--dim-text); 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        cursor: grab; 
+        font-weight: 700; 
+        user-select: none; 
+        transition: all var(--duration-normal); 
+    }
+    .drag-block.dragging { 
+        opacity: 0.7; 
+        box-shadow: 0 0 30px var(--neon-cyan); 
+        border-style: solid;
+        border-color: var(--neon-cyan);
+    }
+    .drop-zone { 
+        height: 300px;
+        background: var(--void-black); 
+        border-radius: var(--radius-lg); 
+        border: 2px dashed var(--neon-cyan); 
+        display: flex; 
+        flex-direction: column; 
+        padding: var(--space-md); 
+        gap: var(--space-md);
+    }
+    .drop-slot { 
+        flex: 1; 
+        background: var(--neural-surface); 
+        border-radius: var(--radius-lg); 
+        border: 2px solid transparent; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        color: var(--dim-text); 
+        font-style: italic; 
+        font-weight: 700; 
+        transition: all var(--duration-normal);
+    }
+    .drop-slot.filled { 
+        border-color: var(--neural-green); 
+        color: var(--neural-green); 
+        font-style: normal; 
+    }
+    .message { 
+        margin-top: 1rem; 
+        text-align: center; 
+        font-weight: 700; 
+        font-size: 1.2rem; 
+        color: var(--neural-green); 
+        height: 1.5rem; /* Reserve space */
+    }
+    .message.error { color: #ff0044; }
+    
+    .download-btn {
+      margin-top: 2rem;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 1.1rem;
+      text-transform: uppercase;
+      background: linear-gradient(135deg, var(--neon-magenta), var(--neon-cyan));
+      border: none;
+      border-radius: var(--radius-lg);
+      padding: 1rem 2rem;
+      color: var(--void-black);
+      cursor: pointer;
+      box-shadow: 0 0 25px var(--neon-magenta), 0 0 45px var(--neon-cyan);
+      transition: transform 0.3s, box-shadow 0.3s;
+      display: block;
+      width: 100%;
+      text-align: center;
+      text-decoration: none;
+      box-sizing: border-box;
+    }
+    .download-btn:hover { 
+        transform: scale(1.05); 
+        box-shadow: 0 0 30px var(--neon-magenta), 0 0 60px var(--neon-cyan); 
+    }
+    .animated-text { 
+        font-weight: 700; 
+        font-size: 1.5rem; 
+        color: var(--neural-green); 
+        text-align: center; 
+        margin-bottom: var(--space-md); 
+        opacity: 0; 
+        transition: opacity 0.5s;
+    }
+    @media (max-width: 600px) {
+      body { padding: var(--space-md); }
+      #container { padding: var(--space-lg); }
+      .layout-container { grid-template-columns: 100px 1fr; gap: var(--space-md); }
+      .download-btn { font-size: 1rem; padding: 0.8rem 1rem; }
+    }
 </style>
 </head>
 <body>
+<div class="neural-bg">
+    <div class="circuit-grid"></div>
+</div>
 <div id="container">
   <div id="missionBriefing" class="terminal"></div>
-  <button id="startBtn" style="margin-top:1rem; background:#00ffff; color:#0a0a0a; border:none; padding:0.6rem 1.2rem; border-radius:10px; cursor:pointer; font-weight:700; display:none;">BEGIN CALIBRATION</button>
+  <button id="startBtn" style="display:none;">BEGIN CALIBRATION</button>
   <div id="challengeSection" style="display:none; margin-top:1rem;"></div>
   <div id="rewardSection" style="display:none; margin-top:2rem;"></div>
 </div>
@@ -85,7 +302,7 @@ const missionElement = document.getElementById('missionBriefing');
 const startBtn = document.getElementById('startBtn');
 const challengeSection = document.getElementById('challengeSection');
 const rewardSection = document.getElementById('rewardSection');
-// Typing effect
+
 function typeText(lines, container, delay=60, callback) {
   let lineIndex = 0, charIndex = 0, output = '';
   function type() {
@@ -93,13 +310,13 @@ function typeText(lines, container, delay=60, callback) {
     const line = lines[lineIndex];
     if (charIndex < line.length) {
       output += line.charAt(charIndex);
-      container.textContent = output + '_';
+      container.innerHTML = output + '<span class="blinking-cursor"></span>';
       charIndex++; setTimeout(type, delay);
     } else {
       output += '\n';
-      container.textContent = output;
+      container.innerHTML = output;
       charIndex = 0; lineIndex++;
-      setTimeout(type, delay * 10);
+      setTimeout(type, delay * 5);
     }
   } type();
 }
@@ -107,28 +324,29 @@ typeText(missionLines, missionElement, 50, () => {
   missionElement.textContent = missionLines.join('\n');
   startBtn.style.display = 'inline-block';
 });
+
 const challenges = {
   challenge01: {
-    title: "Calibrate the Color Matrix",
-    instruction: "STABILIZE THE CORE FREQUENCY. SELECT THE THREE PRIMARY BRAND HUES.",
+    title: "[CHALLENGE 01: CALIBRATE COLOR MATRIX]",
+    instruction: "Select the three primary brand hues.",
     colors: [
       {name: "Cyan", correct:true, colorCode: "#00FFFF"},
-      {name: "Magenta", correct:true, colorCode: "#FF00FF"},
+      {name: "Magenta", correct:true, colorCode: "#FF0080"},
       {name: "Green", correct:true, colorCode: "#00FF41"},
-      {name: "Decoy", correct:false, colorCode: "#FF8000"}
+      {name: "Decoy", correct:false, colorCode: "#FFD700"}
     ]
   },
   challenge02: {
-    title: "Align Font Protocols",
-    instruction: "SELECT THE FONT PAIRING WITH THE HIGHEST SIGNAL-TO-NOISE RATIO.",
+    title: "[CHALLENGE 02: ALIGN FONT PROTOCOLS]",
+    instruction: "Select the font pairing with the highest signal-to-noise ratio.",
     options: [
-      {pairing: "Sharp Serif & Clean Sans-Serif", correct:true},
-      {pairing: "Generic Bubbly Font", correct:false}
+      {pairing: "Playfair Display & Inter", correct:true},
+      {pairing: "Comic Sans & Times New Roman", correct:false}
     ]
   },
   challenge03: {
-    title: "Assemble the Grid Layout",
-    instruction: "CONSTRUCT THE VISUAL HIERARCHY.",
+    title: "[CHALLENGE 03: ASSEMBLE GRID LAYOUT]",
+    instruction: "Construct the visual hierarchy.",
     blocks: ["IMAGE", "HEADLINE", "BODY"],
     correctOrder: ["IMAGE", "HEADLINE", "BODY"]
   }
@@ -142,7 +360,7 @@ function renderChallenge(challengeNum) {
   else if (challengeNum === 2) { renderFontProtocols(); }
   else if (challengeNum === 3) { renderGridAssembly(); }
 }
-// Challenge 1: Color matrix
+
 function renderColorMatrix() {
   const challenge = challenges.challenge01;
   const title = document.createElement('h3');
@@ -150,6 +368,7 @@ function renderColorMatrix() {
   const instruction = document.createElement('p');
   instruction.textContent = challenge.instruction;
   const colorsDiv = document.createElement('div');
+  colorsDiv.style.textAlign = 'center';
   challenge.colors.forEach(c => {
     const swatch = document.createElement('div');
     swatch.className = 'color-swatch';
@@ -161,7 +380,6 @@ function renderColorMatrix() {
       if (c.correct) {
         colorSelections.add(c.name);
         swatch.classList.add('correct');
-        playBleep();
         if (colorSelections.size === 3) {
           showMessage('MATRIX STABLE', false);
           setTimeout(() => { advanceChallenge(); }, 1000);
@@ -169,7 +387,6 @@ function renderColorMatrix() {
       } else {
         swatch.classList.add('incorrect');
         showMessage('ERROR: INVALID HUE', true);
-        playError();
       }
     });
     colorsDiv.appendChild(swatch);
@@ -178,7 +395,7 @@ function renderColorMatrix() {
   challengeSection.appendChild(instruction);
   challengeSection.appendChild(colorsDiv);
 }
-// Challenge 2: Font protocols
+
 function renderFontProtocols() {
   const challenge = challenges.challenge02;
   const title = document.createElement('h3');
@@ -190,23 +407,25 @@ function renderFontProtocols() {
   challenge.options.forEach(opt => {
     const optDiv = document.createElement('div');
     optDiv.className = 'font-option';
-    optDiv.textContent = opt.pairing;
+    if(opt.correct) {
+        optDiv.innerHTML = `<h4 style="font-family: 'Playfair Display', serif;">Headline Energy</h4><p style="font-family: 'Inter', sans-serif;">Body copy that provides clarity.</p>`;
+    } else {
+        optDiv.innerHTML = `<h4 style="font-family: 'Comic Sans MS', cursive;">Headline Energy</h4><p style="font-family: 'Times New Roman', serif;">Body copy that provides clarity.</p>`;
+    }
     optDiv.addEventListener('click', () => {
       if (opt.correct) {
         optDiv.classList.add('correct');
         showMessage('PROTOCOL ALIGNED', false);
-        playBleep();
         setTimeout(() => { advanceChallenge(); }, 1000);
       } else {
-        optDiv.style.backgroundColor = '#330000';
+        optDiv.style.borderColor = '#ff0044';
         showMessage('ERROR: LOW SIGNAL DETECTED', true);
-        playError();
       }
     });
     challengeSection.appendChild(optDiv);
   });
 }
-// Challenge 3: Grid Assembly
+
 function renderGridAssembly() {
   const challenge = challenges.challenge03;
   const title = document.createElement('h3');
@@ -215,6 +434,10 @@ function renderGridAssembly() {
   instruction.textContent = challenge.instruction;
   challengeSection.appendChild(title);
   challengeSection.appendChild(instruction);
+  
+  const layoutContainer = document.createElement('div');
+  layoutContainer.className = 'layout-container';
+
   const blocksDiv = document.createElement('div');
   blocksDiv.className = 'drag-blocks';
   challenge.blocks.forEach(block => {
@@ -232,62 +455,48 @@ function renderGridAssembly() {
     });
     blocksDiv.appendChild(div);
   });
+
   const dropZone = document.createElement('div');
   dropZone.className = 'drop-zone';
-  const dropSlots = [];
   for (let i = 0; i < 3; i++) {
     const slot = document.createElement('div');
     slot.className = 'drop-slot';
     slot.dataset.index = i;
     slot.textContent = `[${challenge.correctOrder[i]}]`;
     dropZone.appendChild(slot);
-    dropSlots.push(slot);
-    slot.addEventListener('dragover', (e) => {
-      e.preventDefault();
-      slot.style.borderColor = '#00ff41';
-    });
-    slot.addEventListener('dragleave', () => {
-      slot.style.borderColor = 'transparent';
-    });
+    slot.addEventListener('dragover', (e) => { e.preventDefault(); slot.style.backgroundColor = 'rgba(0, 255, 255, 0.2)'; });
+    slot.addEventListener('dragleave', () => { slot.style.backgroundColor = '#001010'; });
     slot.addEventListener('drop', (e) => {
       e.preventDefault();
+      slot.style.backgroundColor = '#001010';
       const draggedBlock = e.dataTransfer.getData('text/plain');
       const correctBlock = challenge.correctOrder[slot.dataset.index];
       if (draggedBlock === correctBlock) {
         if (slot.classList.contains('filled')) return;
         slot.classList.add('filled');
         slot.textContent = draggedBlock;
-        slot.style.borderColor = '#00ff41';
-        playClunk();
         checkGridCompletion();
-        const dragBlocks = document.querySelectorAll('.drag-block');
-        dragBlocks.forEach(db => {
-          if (db.textContent === draggedBlock) {
-            db.style.visibility = 'hidden';
-            db.draggable = false;
-          }
-        });
+        const dragBlockEl = document.querySelector(`.drag-block[data-block-name="${draggedBlock}"]`);
+        if(dragBlockEl) dragBlockEl.style.visibility = 'hidden';
       } else {
         showMessage('ERROR: INCORRECT PLACEMENT', true);
-        playError();
       }
     });
   }
-  challengeSection.appendChild(blocksDiv);
-  challengeSection.appendChild(dropZone);
+  layoutContainer.appendChild(blocksDiv);
+  layoutContainer.appendChild(dropZone);
+  challengeSection.appendChild(layoutContainer);
 }
+
 function checkGridCompletion() {
   const slots = document.querySelectorAll('.drop-slot');
   const filledCount = Array.from(slots).filter(s => s.classList.contains('filled')).length;
   if (filledCount === slots.length) {
-    const dropZone = document.querySelector('.drop-zone');
-    dropZone.style.transition = 'background-color 0.4s';
-    dropZone.style.backgroundColor = '#00ff4166';
-    setTimeout(() => { dropZone.style.backgroundColor = '#002020'; }, 300);
-    playBleep();
+    showMessage('HIERARCHY ESTABLISHED', false);
     setTimeout(() => { advanceChallenge(); }, 1000);
   }
 }
+
 let messageTimeout = null;
 function showMessage(text, isError) {
   let messageDiv = document.getElementById('message');
@@ -298,20 +507,17 @@ function showMessage(text, isError) {
     challengeSection.appendChild(messageDiv);
   }
   messageDiv.textContent = text;
-  messageDiv.classList.toggle('error', isError);
+  messageDiv.className = isError ? 'message error' : 'message';
   if (messageTimeout) clearTimeout(messageTimeout);
-  messageTimeout = setTimeout(() => { messageDiv.textContent = ''; }, 3000);
+  messageTimeout = setTimeout(() => { if(messageDiv) messageDiv.textContent = ''; }, 2000);
 }
-// Sound effects (replace with real audio if desired)
-const bleepSound = new Audio('data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAABCxAgAEABAAZGF0YQAAAAA=');
-function playBleep() { bleepSound.play().catch(() => {}); }
-function playError() { /* Could play error beep here */ }
-function playClunk() { /* Could play clunk sound here */ }
+
 function advanceChallenge() {
   currentChallenge++;
   if (currentChallenge <= 3) { renderChallenge(currentChallenge); }
   else { showReward(); }
 }
+
 function showReward() {
   challengeSection.style.display = 'none';
   rewardSection.style.display = 'block';
@@ -326,16 +532,17 @@ function showReward() {
     div.className = 'animated-text';
     div.textContent = line;
     rewardSection.appendChild(div);
-    setTimeout(() => { div.style.opacity = 1; }, 150 * i);
+    setTimeout(() => { div.style.opacity = 1; }, 200 * i);
   });
   const downloadLink = document.createElement('a');
   downloadLink.href = 'https://www.canva.com/design/DAGt4phZ3UQ/2H83CFApjaQm10hSTSg6EA/view?utm_content=DAGt4phZ3UQ&utm_campaign=designshare&utm_medium=link&utm_source=publishsharelink&mode=preview';
   downloadLink.target = '_blank';
   downloadLink.rel = 'noopener noreferrer';
   downloadLink.className = 'download-btn';
-  downloadLink.textContent = 'DOWNLOAD TEMPLATE BUNDLE';
+  downloadLink.textContent = '[DOWNLOAD TEMPLATE BUNDLE]';
   rewardSection.appendChild(downloadLink);
 }
+
 startBtn.onclick = () => {
   startBtn.style.display = 'none';
   missionElement.style.display = 'none';
